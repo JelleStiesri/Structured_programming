@@ -33,6 +33,10 @@ Gamemodes:
             game_1()
         elif game == '2':
             game_2()
+        elif game == '3':
+            print('hoi')
+        elif game == '4':
+            game_4()
 
 
 def create_all_answers():
@@ -48,18 +52,24 @@ def create_all_answers():
 
 
 def create_feedback(code, guess):
-    player_input = input('Give feedback with X, W and B: ')
-    player_feedback = []
-    feedback = {}
-    for i in player_input:
-        if i != 'X' and i != 'W' and i != 'B':
-            value = ' '
-            player_feedback.append(value)
-        else:
-            value = i
-            player_feedback.append(value)
+    feedback = {'B': 0, 'W': 0}
+
     for i in range(0, 4):
-        feedback[guess[i]] = player_feedback[i]
+        if code[i] == guess[i]:
+            feedback['B'] += 1
+        elif guess[i] in code:
+            if guess.count(guess[i]) == code.count(guess[i]):
+                count = 0
+                for x in range(0, 4):
+                    if x == guess[i]:
+                        count += 1
+                if count > code.count(guess[i]):
+                    feedback['W'] = code.count(guess[i]) - count
+                else:
+                    feedback['W'] += 1
+
+        else:
+            continue
 
     return feedback
 
@@ -69,25 +79,23 @@ def code_guess(lst):
     if not code.isdigit():
         print('Enter a code with numbers between one and six')
     else:
-        first_guess = '1234'
-        attempts = 1
+        attempts = 0
         lives = 10
-        print('Computers first guess: ', first_guess)
+        while lives > 0:
+            guess = random.choice(lst)
+            feedback = create_feedback(code, guess)
+            for i in reversed(lst):
+                item_feedback = create_feedback(guess, i)
+                if feedback != item_feedback:
+                    lst.remove(i)
 
-        if first_guess == code:
-            print('The computer found the correct code in ', attempts, ' attempts')
-        else:
-            feedback = create_feedback(code, first_guess)
             lives -= 1
             attempts += 1
-
-            for i in feedback:
-                if feedback[i] == 'X':
-                    print(i, feedback[i])
-                    for x in lst:
-                        if str(i) in x:
-                            print(x)
-                            lst.remove(x)
+            if guess == code:
+                print('De computer heeft de code geraden in ', attempts, ' pogingen')
+                break
+            elif lives == 0:
+                print('GAME OVER')
 
 
 def game_1():
@@ -120,6 +128,7 @@ def game_1():
                             feedback.append('X')
                     lives -= 1
 
+                    random.shuffle(feedback)
                     feedback = "-".join(feedback)
                     print(feedback)
 
@@ -131,6 +140,10 @@ def game_1():
 def game_2():
     all_answers = create_all_answers()
     code_guess(all_answers)
+
+
+def game_4():
+    print('hoi')
 
 
 game_menu()
