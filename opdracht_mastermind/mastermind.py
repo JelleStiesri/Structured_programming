@@ -1,5 +1,5 @@
 import random
-
+import itertools
 
 def create_code():
     code = ''
@@ -7,9 +7,8 @@ def create_code():
         number = random.randint(1, 6)
         code_num = str(number)
         code += code_num
-
+        
     return code
-
 
 def game_menu():
     print("""
@@ -25,33 +24,31 @@ Gamemodes:
 2. player gives code cpu guesses (algorithm 1)
 3. player gives code cpu guesses (algorithm 2)
 4. player gives code cpu guesses (self made algorithm 3)
+5. Exit game
     """)
-
-    game = input('Enter your choice: ')
-    if game.isdigit():
-        if game == '1':
-            game_1()
-        elif game == '2':
-            game_2()
-        elif game == '3':
-            game_3()
-        elif game == '4':
-            print(game_4())
-
-
+    while True: #Zodat je het spel nog een keer kan spelen
+        game = input('Enter your choice: ') 
+        if game.isdigit(): #waarom geen int vragen?
+            if game == '1':
+                game_1()
+            elif game == '2':
+                game_2()
+            elif game == '3':
+                game_3()
+            elif game == '4':
+                print(game_4())
+            elif game == '5':
+                print('Bye!')
+                break
+        
 def create_all_answers():
     all_answers = []
-    for i in range(1111, 6667):
-        answer = str(i)
-        if '7' in answer or '8' in answer or '9' in answer or '0' in answer:
-            continue
-        else:
-            all_answers.append(answer)
+    all_answers = sorted(list(itertools.product(‘123456’, repeat=4))) #Makkelijkere optie! (Dit werkt nog niet helemaal met je programma)
 
     return all_answers
 
 
-def create_feedback(code, guess):
+def create_feedback(code, guess): #Mooi en kleine functie
     feedback = {'B': 0, 'W': 0}
     lst = []
 
@@ -81,13 +78,14 @@ def calc_worst_case(lst):
 
 def simple_strategy(lst):
     # af
-    code = input('Enter a code: ')
+    code = intinput('Enter a code: ')
     if not code.isdigit():
         print('Enter a code with numbers between one and six')
+    #Elif.... (Zorgen dat je niet een hoger nummer dan 6 kan geven
     else:
         attempts = 0
         lives = 10
-        while lives > 0:
+        while lives != 0:
             guess = lst[0]
             feedback = create_feedback(code, guess)
             print(guess)
@@ -136,22 +134,21 @@ def worst_case(lst):
 
             if lives == 0:
                 print('De computer heeft de code niet geraden')
-                break
+                break 
 
             elif code == guess:
                 print('De computer heeft de code geraden in ', attempts, ' pogingen')
                 break
 
-
 def game_1():
     # af
 
     lives = 10
-    code = create_code()
+    code = create_code() #is het niet sneller om dit buiten de functie te maken?
 
-    while lives > 0: 
+    while lives != 0: 
         guess = input("Guess the code: ")
-        if not guess.isdigit():
+        if not guess.isdigit(): #extra if toevoegen om te kijken of de getallen niet groter zijn dan 6
             print('Enter a code with numbers between one and six')
         else:
             if len(guess) != 4:
@@ -162,24 +159,21 @@ def game_1():
                     exit()
 
                 else:
-                    feedback = []
+                    feedback = [] 
                     for i in range(0, len(guess)):
                         if guess[i] == code[i]:
                             feedback.append('B')
-
                         elif guess[i] in code:
                             feedback.append('W')
-
                         else:
                             feedback.append('X')
                     lives -= 1
 
-                    random.shuffle(feedback)
+                    random.shuffle(feedback) 
                     feedback = "-".join(feedback)
                     print(feedback)
-
-    if lives == 0:
-        print('GAME OVER')
+                    
+        print('GAME OVER') #If hierboven is onnodig, want de while loop is ook een if statement
         exit()
 
 
