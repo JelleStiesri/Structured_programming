@@ -34,9 +34,9 @@ Gamemodes:
         elif game == '2':
             game_2()
         elif game == '3':
-            print('hoi')
+            game_3()
         elif game == '4':
-            game_4()
+            print(game_4())
 
 
 def create_all_answers():
@@ -53,28 +53,34 @@ def create_all_answers():
 
 def create_feedback(code, guess):
     feedback = {'B': 0, 'W': 0}
+    lst = []
 
     for i in range(0, 4):
         if code[i] == guess[i]:
             feedback['B'] += 1
-        elif guess[i] in code:
-            if guess.count(guess[i]) == code.count(guess[i]):
-                count = 0
-                for x in range(0, 4):
-                    if x == guess[i]:
-                        count += 1
-                if count > code.count(guess[i]):
-                    feedback['W'] = code.count(guess[i]) - count
-                else:
-                    feedback['W'] += 1
+            lst.append(guess[i])
 
-        else:
-            continue
+    for i in range(0, 4):
+        if guess[i] in code:
+            num = guess[i]
+            num_count = guess.count(num)
+            num2_count = code.count(num)
+            if lst.count(guess[i]) < num_count and lst.count(guess[i]) < num2_count:
+                lst.append(num)
+                feedback['W'] += 1
 
     return feedback
 
 
-def code_guess(lst):
+def calc_worst_case(lst):
+    # nog niet af
+    for i in lst:
+        cac = 0
+        item_feedback = create_feedback()
+
+
+def simple_strategy(lst):
+    # af
     code = input('Enter a code: ')
     if not code.isdigit():
         print('Enter a code with numbers between one and six')
@@ -82,13 +88,15 @@ def code_guess(lst):
         attempts = 0
         lives = 10
         while lives > 0:
-            guess = random.choice(lst)
+            guess = lst[0]
             feedback = create_feedback(code, guess)
+            print(guess)
+            print(feedback)
             for i in reversed(lst):
                 item_feedback = create_feedback(guess, i)
                 if feedback != item_feedback:
                     lst.remove(i)
-
+            print(lst)
             lives -= 1
             attempts += 1
             if guess == code:
@@ -96,14 +104,52 @@ def code_guess(lst):
                 break
             elif lives == 0:
                 print('GAME OVER')
+            else:
+                print('De computer heeft de code niet geraden')
+
+
+def worst_case(lst):
+    # nog niet af
+    code = input('Enter a code: ')
+    if not code.isdigit():
+        print('Enter a code with numbers between one and six')
+    else:
+        attempts = 0
+        lives = 10
+        while lives > 0:
+            if attempts == 0:
+                guess = '1122'
+            else:
+                guess = calc_worst_case(lst)
+
+            print(guess)
+            feedback = create_feedback(code, guess)
+            print(feedback)
+            for i in reversed(lst):
+                item_feedback = create_feedback(guess, i)
+                if item_feedback != feedback:
+                    lst.remove(i)
+
+            print(len(lst))
+            attempts += 1
+            lives -= 1
+
+            if lives == 0:
+                print('De computer heeft de code niet geraden')
+                break
+
+            elif code == guess:
+                print('De computer heeft de code geraden in ', attempts, ' pogingen')
+                break
 
 
 def game_1():
+    # af
 
     lives = 10
     code = create_code()
 
-    while lives > 0:
+    while lives > 0: 
         guess = input("Guess the code: ")
         if not guess.isdigit():
             print('Enter a code with numbers between one and six')
@@ -139,11 +185,23 @@ def game_1():
 
 def game_2():
     all_answers = create_all_answers()
-    code_guess(all_answers)
+    simple_strategy(all_answers)
+
+
+def game_3():
+    all_answers = create_all_answers()
+    worst_case(all_answers)
 
 
 def game_4():
-    print('hoi')
+    all_answers = create_all_answers()
+    code = input('Enter a code: ')
+    attempts = 0
+    for i in all_answers:
+        if i == code:
+            return 'De code is gevonden in ' + str(attempts) + ' pogingen'
+        else:
+            attempts += 1
 
 
 game_menu()
